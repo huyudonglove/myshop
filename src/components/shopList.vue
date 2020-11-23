@@ -4,6 +4,9 @@
         销售单
       </div>
       <div>
+        不可编辑，只可以删除
+      </div>
+      <div>
         <el-button @click="visible=true">创建</el-button>
       </div>
       <el-table :data="tableData" style="width: 80%">
@@ -21,11 +24,13 @@
           </template>
         </el-table-column>
         <el-table-column prop="selltime" label="销售时间">
+          <template slot-scope="scope">
+            {{new Date(parseInt(scope.row.selltime)).toLocaleString().replace(/:\d{1,2}$/,' ')}}
+          </template>
         </el-table-column>
         <el-table-column prop="address" label="操作">
-          <template>
-            <el-button>编辑</el-button>
-            <el-button>删除</el-button>
+          <template slot-scope="scope">
+            <el-button @click="deletesell(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -47,7 +52,7 @@
           <el-input v-model="pice" style="width: 200px"></el-input>
         </div>
         <div>销售时间
-          <el-date-picker v-model="time" type="datetime" placeholder="选择日期时间" value-format="yyyy-MM-dd HH:mm:ss">
+          <el-date-picker v-model="time" type="datetime" placeholder="选择日期时间" value-format="timestamp">
           </el-date-picker>
         </div>
         <span slot="footer" class="dialog-footer">
@@ -115,6 +120,14 @@
             r.imageUrl=`/api/public/${r.image}`;
             this.tableData.push(r)
           })
+        })
+      },
+      deletesell(id){
+        let msg={
+          id:id
+        }
+        this.$http.post('/api/deletesell',msg).then(v=>{
+
         })
       }
     },

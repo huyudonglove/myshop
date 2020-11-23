@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 import shopList from '../components/shopList'
 import buyList from '../components/buyList'
 import stockList from '../components/stockList'
+import member from '../components/member'
 Vue.use(Router)
 
 export default new Router({
@@ -27,6 +28,11 @@ export default new Router({
       path:'/stockList',
       name:'stockList',
       component:stockList
+    },
+    {
+      path:'/member',
+      name:'member',
+      component:member
     }
   ]
 })

@@ -2,6 +2,9 @@
     <div>
       <div>进货单</div>
       <div>
+        在未产生销售单可编辑和删除
+      </div>
+      <div>
         <el-button @click="show()">创建</el-button>
       </div>
       <el-table :data="tableData" style="width: 80%">
@@ -16,7 +19,7 @@
               <img :src="scope.row.imageUrl" alt="" width="50" height="50">
             </template>
         </el-table-column>
-        <el-table-column prop="number" label="总数">
+        <el-table-column prop="number" label="进货数">
         </el-table-column>
         <el-table-column prop="totalpice" label="总价">
         </el-table-column>
@@ -44,7 +47,7 @@
             单价<el-input v-model="buypice"></el-input>
           </span>
           <span>
-            总价<el-input v-model="totalpice" :disabled="true"></el-input>
+            总价<el-input v-model="totalpice" ></el-input>
           </span>
           <span>
             时间
@@ -83,13 +86,12 @@
         image:'',
         id:'',
         imageUrl:'',
-        buytime: ''
+        buytime: '',
+        totalpice:0
       }
     },
     computed:{
-      totalpice(){
-        return this.number*this.buypice
-      }
+
     },
     methods:{
       show(){
@@ -139,6 +141,8 @@
             this.imageUrl=`/api/public/${data.data.image}`
             this.number=data.data.number;
             this.type=data.data.type;
+            this.buytime=data.data.buytime;
+            this.totalpice=data.data.totalpice;
           })();
         })
       },

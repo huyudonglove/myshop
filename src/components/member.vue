@@ -1,19 +1,16 @@
 <template>
     <div>
-      <div>库存单</div>
-      <div>
-        不可编辑删除，同步进货单
-      </div>
+      会员
       <el-table :data="tableData" style="width: 80%">
         <el-table-column prop="id" label="ID" width="180">
         </el-table-column>
-        <el-table-column prop="type" label="型号" width="180">
+        <el-table-column prop="type" label="会员编号" width="180">
         </el-table-column>
-        <el-table-column prop="nownum" label="现存数量">
+        <el-table-column prop="nownum" label="名称">
         </el-table-column>
-        <el-table-column prop="totalnum" label="总库存">
+        <el-table-column prop="totalnum" label="联系方式">
         </el-table-column>
-        <el-table-column prop="remainingpice" label="销售金额">
+        <el-table-column prop="remainingpice" label="购买金额">
         </el-table-column>
         <el-table-column prop="image" label="图片">
           <template slot-scope="scope">
@@ -22,7 +19,7 @@
         </el-table-column>
         <el-table-column prop="totalpice" label="总价">
         </el-table-column>
-        <el-table-column prop="buytime" label="购买时间">
+        <el-table-column prop="buytime" label="消费记录">
           <template slot-scope="scope">
             {{new Date(parseInt(scope.row.buytime)).toLocaleString().replace(/:\d{1,2}$/,' ')}}
           </template>
@@ -34,25 +31,11 @@
 
 <script>
   export default {
-    name: 'stockList',
+    name: 'member',
     data(){
       return{
         tableData:[]
       }
-    },
-    methods:{
-      getStock(){
-        this.$http.get('/api/getStock').then(v=>{
-          this.tableData=[];
-          v.data.data.map(r=>{
-            r.imageUrl=`/api/public/${r.image}`;
-            this.tableData.push(r)
-          })
-        })
-      }
-    },
-    created () {
-      this.getStock();
     }
   }
 </script>

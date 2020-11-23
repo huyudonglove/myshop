@@ -32,6 +32,7 @@ export default {
           this.$router.push('/stockList');
           break;
         case '4':
+          this.$router.push('/member');
           break;
         default:
           break;
