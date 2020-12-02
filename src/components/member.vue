@@ -6,10 +6,13 @@
       <div class="support">
         会员信息只可编辑，不可删除
       </div>
-      <el-table :data="tableData" style="width: 80%" ref="table" :max-height="tableHeight" border>
+      <el-table :data="tableData" style="width: 80%" ref="table" :max-height="tableHeight" border stripe>
         <el-table-column prop="id" label="ID" width="180">
         </el-table-column>
         <el-table-column prop="memberName" label="会员名称">
+          <template slot-scope="scope">
+            <span style="color: #b4763e">{{scope.row.memberName}}</span>
+          </template>
         </el-table-column>
         <el-table-column prop="memberPhone" label="联系方式">
         </el-table-column>
@@ -34,7 +37,7 @@
           </el-table-column>
           <el-table-column prop="iamge" label="图片" align="center">
             <template slot-scope="scope">
-              <img :src="scope.row.imageUrl" alt="" width="80" height="80" align="center">
+              <img :src="scope.row.imageUrl" alt="" width="80" height="80" align="center" v-focus>
             </template>
           </el-table-column>
           <el-table-column prop="selltime" label="销售时间" align="center" width="180">
@@ -43,6 +46,9 @@
             </template>
           </el-table-column>
           <el-table-column prop="memberName" label="会员" align="center">
+            <template slot-scope="scope">
+              <span style="color: #b4763e">{{scope.row.memberName}}</span>
+            </template>
           </el-table-column>
           <el-table-column prop="sellRole" label="销售人员" align="center">
             <template slot-scope="scope">

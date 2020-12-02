@@ -9,7 +9,7 @@
       <div class="support">
         进货单自动同步库存单
       </div>
-      <el-table :data="tableData" style="width: 80%" border ref="table" :max-height="tableHeight">
+      <el-table :data="tableData" style="width: 80%" border ref="table" :max-height="tableHeight" stripe>
         <el-table-column prop="id" label="ID" width="180">
         </el-table-column>
         <el-table-column prop="type" label="型号" width="180">
@@ -18,7 +18,7 @@
         </el-table-column>
         <el-table-column prop="image" label="图片">
             <template slot-scope="scope">
-              <img :src="scope.row.imageUrl" alt="" width="50" height="50">
+              <img :src="scope.row.imageUrl" alt="" width="50" height="50" v-focus>
             </template>
         </el-table-column>
         <el-table-column prop="number" label="数量">
@@ -72,7 +72,7 @@
             <div class="h-div">
               图片
             </div>
-            <el-upload class="avatar-uploader" action="/api/upload" :show-file-list="false" :on-success="handleAvatarSuccess" accept="image/png, image/jpeg">
+            <el-upload class="avatar-uploader" action="/api/upload" :show-file-list="false" :on-success="handleAvatarSuccess" accept="image/png, image/jpeg" :headers="header">
             <img v-if="imageUrl" :src="imageUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
@@ -105,7 +105,10 @@
         buytime: '',
         totalpice:0,
         totalPage:0,
-        tableHeight:0
+        tableHeight:0,
+        header:{
+          Authorization:sessionStorage.getItem('token')
+        }
       }
     },
     components:{
@@ -203,14 +206,22 @@
         })
       },
       deleteBuy(id){
-        let msg={
-          id:id
-        }
-        const loading=this.$loading();
-        this.$http.post(`/api/deleteBuy`,msg).then(res=>{
-          loading.close();
-          this.getBuy();
+        this.$confirm('确定删除吗').then(v=>{
+          let msg={
+            id:id
+          }
+          const loading=this.$loading();
+          this.$http.post(`/api/deleteBuy`,msg).then(res=>{
+            loading.close();
+            if(res.data.code){
+              this.$message.error(res.data.msg)
+            }
+            this.getBuy();
+          })
+        }).catch(r=>{
+          return
         })
+
       },
       handleAvatarSuccess(res, file) {
         console.log(res,7777)

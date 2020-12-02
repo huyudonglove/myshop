@@ -3,7 +3,7 @@
       <div class="support" style="margin-top: 10px">
         不可编辑删除，同步进货单和销售单
       </div>
-      <el-table :data="tableData" style="width: 80%" border ref="table" :max-height="tableHeight">
+      <el-table :data="tableData" style="width: 80%" border ref="table" :max-height="tableHeight" stripe>
         <el-table-column prop="id" label="ID" width="180">
         </el-table-column>
         <el-table-column prop="type" label="型号" width="180">
@@ -16,7 +16,7 @@
         </el-table-column>
         <el-table-column prop="image" label="图片">
           <template slot-scope="scope">
-            <img :src="scope.row.imageUrl" alt="" width="50" height="50">
+            <img :src="scope.row.imageUrl" alt="" width="50" height="50" v-focus>
           </template>
         </el-table-column>
         <el-table-column prop="totalpice" label="总价">

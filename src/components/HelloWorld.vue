@@ -75,7 +75,16 @@ export default {
     }
   },
   created () {
-    this.judgeR()
+    console.log(1111)
+    this.judgeR();
+  },
+  watch:{
+    $route(){
+      if(this.$route.name=='HelloWorld'){
+        this.$router.push('/shopList');
+        this.activeIndex='1';
+      }
+    }
   }
 }
 </script>

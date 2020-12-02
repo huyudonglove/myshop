@@ -6,6 +6,7 @@ import router from './router'
 import ElementUI from 'element-ui';
 import '../theme/index.css'
 import http from 'axios'
+import huDirective from 'imgbig'
 http.defaults.headers.common['Authorization'] = '';
 http.interceptors.request.use(
   config=>{
@@ -53,6 +54,7 @@ http.interceptors.response.use(
 Vue.config.productionTip = false
 Vue.prototype.$http=http;
 Vue.use(ElementUI);
+Vue.use(huDirective);
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

@@ -17,11 +17,14 @@
         </el-table-column>
         <el-table-column prop="sellnumber" label="销售数量" align="center">
         </el-table-column>
-        <el-table-column prop="sellpice" label="金额" align="center">
+        <el-table-column prop="sellpice" label="金额" align="center" >
+          <template slot-scope="scope">
+            <span >{{scope.row.sellpice}}</span>
+          </template>
         </el-table-column>
         <el-table-column prop="iamge" label="图片" align="center">
           <template slot-scope="scope">
-            <img :src="scope.row.imageUrl" alt="" width="80" height="80" align="center">
+            <img :src="scope.row.imageUrl" alt="" width="80" height="80" align="center" v-focus>
           </template>
         </el-table-column>
         <el-table-column prop="selltime" label="销售时间" align="center" width="180">
@@ -30,17 +33,20 @@
           </template>
         </el-table-column>
         <el-table-column prop="memberName" label="会员" align="center">
+          <template slot-scope="scope">
+              <span style="color: #b4763e">{{scope.row.memberName}}</span>
+          </template>
         </el-table-column>
         <el-table-column prop="sellRole" label="销售人员" align="center">
           <template slot-scope="scope">
-            <p v-for="item in scope.row.sell">
+            <p v-for="item in scope.row.sell" style="color: #69a079">
               {{item.name}}
             </p>
           </template>
         </el-table-column>
         <el-table-column prop="address" label="操作" align="center">
           <template slot-scope="scope">
-            <el-button @click="deletesell(scope.row.id)" type="warning">删除</el-button>
+            <el-button @click="deletesell(scope.row.id)" type="warning" size="medium">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -150,7 +156,7 @@
         this.type=item.type;
       },
       getBuy(){
-        this.$http.get('/api/getBuy').then(v=>{
+        this.$http.get('/api/getBuy?type=1').then(v=>{
           console.log(v);
           const data=v.data.data;
           this.all=data;
