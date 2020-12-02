@@ -1,10 +1,9 @@
 <template>
     <div>
-      <div>库存单</div>
-      <div>
-        不可编辑删除，同步进货单
+      <div class="support" style="margin-top: 10px">
+        不可编辑删除，同步进货单和销售单
       </div>
-      <el-table :data="tableData" style="width: 80%">
+      <el-table :data="tableData" style="width: 80%" border ref="table" :max-height="tableHeight">
         <el-table-column prop="id" label="ID" width="180">
         </el-table-column>
         <el-table-column prop="type" label="型号" width="180">
@@ -27,27 +26,47 @@
             {{new Date(parseInt(scope.row.buytime)).toLocaleString().replace(/:\d{1,2}$/,' ')}}
           </template>
         </el-table-column>
-
       </el-table>
+      <div>
+        <pagination :total="totalPage"></pagination>
+      </div>
     </div>
 </template>
 
 <script>
+  import pagination from '../share/pagination'
   export default {
     name: 'stockList',
     data(){
       return{
-        tableData:[]
+        tableData:[],
+        totalPage:0,
+        tableHeight:0
       }
+    },
+    components:{
+      pagination
     },
     methods:{
       getStock(){
-        this.$http.get('/api/getStock').then(v=>{
+        let msg={
+          page:this.$route.query.page||1,
+          limit:this.$route.query.limit||20
+        }
+        this.$http.post('/api/postStock',msg).then(v=>{
           this.tableData=[];
+          this.totalPage=v.data.totalPage;
           v.data.data.map(r=>{
             r.imageUrl=`/api/public/${r.image}`;
             this.tableData.push(r)
           })
+        })
+      }
+    },
+    updated(){
+      if(this.$route.name=='stockList'){
+        this.$nextTick(()=>{
+          this.tableHeight = window.innerHeight - this.$refs.table.$el.offsetTop - 110;
         })
       }
     },

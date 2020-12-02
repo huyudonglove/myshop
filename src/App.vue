@@ -1,11 +1,5 @@
 <template>
   <div id="app">
-    <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-      <el-menu-item index="1">销售单</el-menu-item>
-      <el-menu-item index="2">进货单</el-menu-item>
-      <el-menu-item index="3">库存单</el-menu-item>
-      <el-menu-item index="4">会员中心</el-menu-item>
-    </el-menu>
     <router-view/>
   </div>
 </template>
@@ -15,29 +9,46 @@ export default {
   name: 'App',
   data() {
     return {
-      activeIndex: '1',
-      activeIndex2: '1'
+
     };
   },
-  methods:{
-    handleSelect(key, keyPath) {
-      switch (key) {
-        case '1':
-          this.$router.push('/shopList');
-          break;
-        case '2':
-          this.$router.push('/buyList');
-          break;
-        case '3':
-          this.$router.push('/stockList');
-          break;
-        case '4':
-          this.$router.push('/member');
-          break;
-        default:
-          break;
-      }
+  provide(){
+    return{
+      replace:this.replace
     }
+  },
+  methods:{
+
+    replace(key,val){
+      //修改路由参数
+      let apple=JSON.stringify(this.$route.query);
+      //console.log(apple,'apple')
+      let banner=JSON.parse(apple);
+      if(key!='reset'){
+        banner[key]=val;
+      }else if (key=='reset'){
+        // this.setClickPage(1);
+        // this.setLimitPage(20);
+        for(let i in banner){
+          banner[i]=''
+        }
+
+      }
+      // banner.page=this.clickPage;
+      // banner.limit=this.limitPage;
+
+      // console.log(banner)
+
+      this.$router.push(
+        {
+          path:this.$route.path,
+          query:banner
+        }
+      ).catch(err=>{
+        console.log(err)
+      })
+    },
+
   }
 }
 </script>

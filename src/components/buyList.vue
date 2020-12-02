@@ -1,13 +1,15 @@
 <template>
     <div>
-      <div>进货单</div>
       <div>
-        在未产生销售单可编辑和删除
+        <el-button @click="show()" type="primary" style="margin-top: 10px">创建</el-button>
       </div>
-      <div>
-        <el-button @click="show()">创建</el-button>
+      <div class="support">
+        在未产生销售单前进货单可编辑和删除
       </div>
-      <el-table :data="tableData" style="width: 80%">
+      <div class="support">
+        进货单自动同步库存单
+      </div>
+      <el-table :data="tableData" style="width: 80%" border ref="table" :max-height="tableHeight">
         <el-table-column prop="id" label="ID" width="180">
         </el-table-column>
         <el-table-column prop="type" label="型号" width="180">
@@ -19,7 +21,7 @@
               <img :src="scope.row.imageUrl" alt="" width="50" height="50">
             </template>
         </el-table-column>
-        <el-table-column prop="number" label="进货数">
+        <el-table-column prop="number" label="数量">
         </el-table-column>
         <el-table-column prop="totalpice" label="总价">
         </el-table-column>
@@ -31,37 +33,50 @@
         <el-table-column prop="address" label="操作">
           <template slot-scope="scope">
             <el-button @click="buyMsg(scope.row.id)">编辑</el-button>
-            <el-button @click="deleteBuy(scope.row.id)">删除</el-button>
+            <el-button @click="deleteBuy(scope.row.id)" type="warning">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div>
-        <el-dialog title="提示" :visible.sync="visible" width="30%" >
-          <span>
-            型号<el-input v-model="type"></el-input>
-          </span>
-          <span>
-            数量<el-input v-model="number"></el-input>
-          </span>
-          <span>
-            单价<el-input v-model="buypice"></el-input>
-          </span>
-          <span>
-            总价<el-input v-model="totalpice" ></el-input>
-          </span>
-          <span>
-            时间
+        <pagination :total="totalPage"></pagination>
+      </div>
+      <div>
+        <el-dialog title="进货单" :visible.sync="visible" width="28%" >
+          <div>
+            <div class="h-div"><i style="color: #e4393c;padding: 0 5px">*</i>型号</div>
+            <el-input v-model="type" placeholder="建议输入型号+日期，例如 女装0203，避免重名"></el-input>
+          </div>
+          <div>
+            <div class="h-div"><i style="color: #e4393c;padding: 0 5px">*</i>数量</div>
+            <el-input v-model="number" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"></el-input>
+          </div>
+          <div>
+            <div class="h-div">
+              单价
+            </div>
+            <el-input v-model="buypice" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"></el-input>
+          </div>
+          <div>
+            <div class="h-div"><i style="color: #e4393c;padding: 0 5px">*</i>总价</div>
+            <el-input v-model="totalpice" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"></el-input>
+          </div>
+          <div>
+            <div class="h-div">
+              时间
+            </div>
            <el-date-picker v-model="buytime" type="datetime" placeholder="选择日期时间" @change="change" value-format="timestamp">
             </el-date-picker>
-          </span>
+          </div>
           <br>
-          <span>
-            图片
-            <el-upload class="avatar-uploader" action="/api/upload" :show-file-list="false" :on-success="handleAvatarSuccess" >
+          <div>
+            <div class="h-div">
+              图片
+            </div>
+            <el-upload class="avatar-uploader" action="/api/upload" :show-file-list="false" :on-success="handleAvatarSuccess" accept="image/png, image/jpeg">
             <img v-if="imageUrl" :src="imageUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
-          </span>
+          </div>
 
           <span slot="footer" class="dialog-footer">
             <el-button @click="show()">取 消</el-button>
@@ -74,6 +89,7 @@
 </template>
 
 <script>
+  import pagination from '../share/pagination'
   export default {
     name: 'buyList',
     data(){
@@ -87,11 +103,13 @@
         id:'',
         imageUrl:'',
         buytime: '',
-        totalpice:0
+        totalpice:0,
+        totalPage:0,
+        tableHeight:0
       }
     },
-    computed:{
-
+    components:{
+      pagination
     },
     methods:{
       show(){
@@ -107,18 +125,40 @@
           image:this.image,
           buytime:this.buytime
         }
-        console.log(msg);
+        if(!msg.type){
+          this.$message.error('型号不能为空!')
+          return
+        }
+        if(!msg.number){
+          this.$message.error('数量不能为空!')
+          return
+        }
+        if(!msg.totalpice){
+          this.$message.error('总价不能为空!')
+          return
+        }
+        const loading=this.$loading();
         this.$http.post('/api/createbuy',msg).then(v=>{
-          console.log(v,777);
-          this.getBuy()
+          loading.close();
+          if(v.data.code){
+            this.$message.error(v.data.msg)
+          }else {
+            this.$message.success(v.data.msg);
+            this.visible=false;
+            this.getBuy()
+          }
+
         })
       },
       getBuy(){
         this.tableData=[];
-        this.$http.get('/api/getBuy').then(v=>{
-          console.log(v,777);
+        let msg={
+          page:this.$route.query.page||1,
+          limit:this.$route.query.limit||20
+        }
+        this.$http.post('/api/postBuy',msg).then(v=>{
+          this.totalPage=v.data.totalPage;
           v.data.data.map(r=> {
-            //console.log(rTime(r.buytime))
             r.imageUrl=`/api/public/${r.image}`
             this.tableData.push(r)
             }
@@ -155,7 +195,9 @@
           totalpice:this.totalpice,
           image:this.image
         }
+        const loading=this.$loading();
         this.$http.post('/api/updateBuy',msg).then(res=>{
+          loading.close();
           this.visible=false;
           this.getBuy();
         })
@@ -164,7 +206,9 @@
         let msg={
           id:id
         }
+        const loading=this.$loading();
         this.$http.post(`/api/deleteBuy`,msg).then(res=>{
+          loading.close();
           this.getBuy();
         })
       },
@@ -179,6 +223,18 @@
     },
     mounted () {
       this.getBuy();
+    },
+    updated(){
+      if(this.$route.name=='buyList'){
+        this.$nextTick(()=>{
+          this.tableHeight = window.innerHeight - this.$refs.table.$el.offsetTop - 110;
+        })
+      }
+    },
+    watch:{
+      $route(){
+        this.getBuy();
+      }
     }
   }
 </script>
@@ -206,5 +262,11 @@
     width: 178px;
     height: 178px;
     display: block;
+  }
+  .h-div{
+    padding: 10px 0;
+  }
+  .el-dialog__body{
+    padding-top: 5px;
   }
 </style>
